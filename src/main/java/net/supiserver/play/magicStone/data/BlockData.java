@@ -7,20 +7,23 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class Block {
+import static net.supiserver.play.magicStone.Settings.MAX_FORTUNE_LEVEL;
+import static net.supiserver.play.magicStone.Settings.MAX_WEIGHT;
+
+public class BlockData {
     private final Material block;
     private final Set<Probability> probabilities;
-    private final List<Map<Rank, TreeMap<Double, ItemStack>>> drop_table = new ArrayList<>(6);
+    private final List<Map<Rank, TreeMap<Double, ItemStack>>> drop_table = new ArrayList<>();
 
-    public Block(Material block, Set<Probability> probabilities) {
+    public BlockData(Material block, Set<Probability> probabilities) {
         this.block = block;
         this.probabilities = probabilities;
+        for(int i = 0;i<MAX_FORTUNE_LEVEL+1;i++)drop_table.add(null); //nullで埋めておく
         this.setup();
     }
 
     public void setup() {
-        int max_fortune = 6;
-        for (int i = 0; i < max_fortune; i++) {
+        for (int i = 0; i < MAX_FORTUNE_LEVEL+1; i++) {
             Map<Rank, TreeMap<Double, ItemStack>> rank_data = new HashMap<>();
             for (Rank rank : Rank.values()) {
                 double weight = 0;
@@ -37,8 +40,7 @@ public class Block {
 
     public ItemStack run_lottery(Rank rank, int fortune) {
         TreeMap<Double, ItemStack> table = drop_table.get(fortune).get(rank);
-        double max_weight = table.lastKey();
-        double hit = Math.random() * max_weight;
+        double hit = Math.random() * MAX_WEIGHT;
         for (Map.Entry<Double, ItemStack> entry : table.entrySet()) {
             double weight = entry.getKey();
             ItemStack item = entry.getValue();

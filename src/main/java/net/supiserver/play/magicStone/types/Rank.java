@@ -19,4 +19,13 @@ public enum Rank {
     public String getValue(){
         return this.value;
     }
+
+    public static Rank fromValue(String value) {
+        for (Rank rank : Rank.values()) {
+            if (rank.value.equalsIgnoreCase(value)) {
+                return rank;
+            }
+        }
+        throw new IllegalArgumentException("Invalid Rank value: " + value);
+    }
 }

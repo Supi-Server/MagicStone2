@@ -4,6 +4,8 @@ import net.supiserver.play.magicStone.types.Rank;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 public class Probability {
     private final ItemStack item;
     private final Integer base_weight;
@@ -25,6 +27,14 @@ public class Probability {
 
     public ItemStack getItem(){
         return item;
+    }
+
+    public String toString(){
+        return String.format("{ItemStack: %s, BaseWeight: %d, Bonus: %s",
+                Objects.requireNonNull(item.getItemMeta()).getItemName(),
+                base_weight,
+                bonus.toString()
+        );
     }
 }
 

@@ -14,18 +14,18 @@ public class Excel {
     private final Workbook workbook;
     private Sheet sheet;
 
-    public Excel(String filePath){this(filePath,"Sheet1");}
-    public Excel(String filePath,String default_sheet){
+    public Excel(String filePath)throws IOException{this(filePath,"Sheet1");}
+    public Excel(String filePath,String default_sheet)throws IOException{
         Workbook workbook = null;
-        try {
-            FileInputStream fis = new FileInputStream(filePath);
-            workbook = new XSSFWorkbook(fis);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        FileInputStream fis = new FileInputStream(filePath);
+        workbook = new XSSFWorkbook(fis);
+
         this.workbook = workbook;
-        assert workbook != null;
         this.sheet = workbook.getSheet(default_sheet);
+    }
+
+    public void setSheet(String sheet_name){
+        this.sheet = workbook.getSheet(sheet_name);
     }
 
     public String read(String cellName){return this.read(cellName,"");}
@@ -47,7 +47,7 @@ public class Excel {
         return (result != null && !result.isEmpty()) ? result : default_value;
     }
 
-    private int[] getCellIndex(String cellName){
+    public static int[] getCellIndex(String cellName){
         Pattern pattern = Pattern.compile("([A-Za-z]+)([0-9]+)");
         Matcher matcher = pattern.matcher(cellName);
         if (!matcher.matches()) {
@@ -64,4 +64,28 @@ public class Excel {
         columnIndex -= 1;
         return new int[]{rowIndex,columnIndex};
     }
+
+    public static String getCellName(int[] cellIndex) {
+        if (cellIndex == null || cellIndex.length != 2) {
+            throw new IllegalArgumentException("cellIndex must be an array of two integers.");
+        }
+
+        int rowIndex = cellIndex[1];
+        int columnIndex = cellIndex[0];
+
+        if (rowIndex < 0 || columnIndex < 0) {
+            throw new IllegalArgumentException("Row and column indices must be non-negative.");
+        }
+
+        StringBuilder columnName = new StringBuilder();
+        columnIndex += 1;
+        while (columnIndex > 0) {
+            int remainder = (columnIndex - 1) % 26;
+            columnName.insert(0, (char) (remainder + 'A'));
+            columnIndex = (columnIndex - 1) / 26;
+        }
+
+        return columnName.toString() + rowIndex;
+    }
+
 }
