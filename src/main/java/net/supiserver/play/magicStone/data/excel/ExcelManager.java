@@ -1,5 +1,6 @@
 package net.supiserver.play.magicStone.data.excel;
 
+import net.supiserver.play.magicStone.data.Settings;
 import net.supiserver.play.magicStone.debug.Error;
 import net.supiserver.play.magicStone.model.Bonus;
 import net.supiserver.play.magicStone.model.Item;
@@ -11,7 +12,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.IOException;
 import java.util.*;
 
-import static net.supiserver.play.magicStone.Settings.MAX_FORTUNE_LEVEL;
 
 public class ExcelManager {
     private static final String DEVELOP_SHEET_NAME = "develop_info";
@@ -40,12 +40,15 @@ public class ExcelManager {
     private final String DROP_TABLE_FORTUNE_BONUS_START_COL;
     private final String DROP_TABLE_FORTUNE_BONUS_END_COL;
 
+    private final String BASIC_INFO_SHEET_NAME;
+    private final String BASIC_INFO_MAX_WEIGHT_CELL;
+
     private final Excel excel;
 
     public ExcelManager(String filePath)throws IOException{
 
         excel = new Excel(filePath, DEVELOP_SHEET_NAME);
-
+        excel.open();
         ITEM_DATA_SHEET_NAME = excel.read("D2","item_data");
         ITEM_DATA_START_ROW = (int)Double.parseDouble(excel.read("D3","3"));
         ITEM_DATA_END_ROW = (int)Double.parseDouble(excel.read("D4","19"));
@@ -66,9 +69,29 @@ public class ExcelManager {
         DROP_TABLE_RANK_BONUS_END_COL = excel.read("D18","U");
         DROP_TABLE_FORTUNE_BONUS_START_COL = excel.read("D19","V");
         DROP_TABLE_FORTUNE_BONUS_END_COL = excel.read("D20","Z");
+
+        BASIC_INFO_SHEET_NAME = excel.read("D21","basic_info");
+        BASIC_INFO_MAX_WEIGHT_CELL = excel.read("D22","C2");
+        excel.close();
     }
 
-    public Map<String,ItemStack> readItems(){
+    public Map<BasicData,String> reloadBasicData() throws IOException{
+        Map<BasicData,String> result = new HashMap<>();
+        result.put(BasicData.MAX_FORTUNE_LEVEL,
+            String.valueOf(
+            Excel.getCellIndex(DROP_TABLE_FORTUNE_BONUS_END_COL+"1")[1] -
+                Excel.getCellIndex(DROP_TABLE_FORTUNE_BONUS_START_COL+"1")[1]
+            )
+        );
+        excel.open();
+        excel.setSheet(BASIC_INFO_SHEET_NAME);
+        result.put(BasicData.MAX_WEIGHT,excel.read(BASIC_INFO_MAX_WEIGHT_CELL));
+        excel.close();
+        return result;
+    }
+
+    public Map<String,ItemStack> readItems() throws IOException{
+        excel.open();
         excel.setSheet(ITEM_DATA_SHEET_NAME);
         Map<String,ItemStack> result = new HashMap<>();
         for(int row = ITEM_DATA_START_ROW; row<=ITEM_DATA_END_ROW;row++){
@@ -85,10 +108,13 @@ public class ExcelManager {
                 Error.puts(String.format("ITEM_DATA:『%d行』のアイテムの読み込みに失敗しました。",row));
             }
         }
+        excel.close();
         return result;
     }
 
-    public Map<String, Bonus> readBonus(){
+    public Map<String, Bonus> readBonus() throws IOException{
+        int MAX_FORTUNE_LEVEL = Settings.getMaxFortuneLevel();
+        excel.open();
         excel.setSheet(DROP_TABLE_SHEET_NAME);
         Map<String,Bonus> result = new HashMap<>();
         for(int row = DROP_TABLE_START_ROW; row<=DROP_TABLE_END_ROW;row++){
@@ -136,8 +162,8 @@ public class ExcelManager {
             try{
                 int fortune_start_column = Excel.getCellIndex(DROP_TABLE_FORTUNE_BONUS_START_COL+row)[1];
                 int fortune_end_column = Excel.getCellIndex(DROP_TABLE_FORTUNE_BONUS_END_COL+row)[1];
+                fortune_end_column = Math.max(fortune_end_column,fortune_start_column+MAX_FORTUNE_LEVEL);
                 for(int i = fortune_start_column;i<=fortune_end_column;i++){
-                    String rank = excel.read(Excel.getCellName(new int[]{i,DROP_TABLE_START_ROW-1}));
                     double cellValue = Double.parseDouble(excel.read(Excel.getCellName(new int[]{i,row})));
                     fortuneBonus[i-fortune_start_column] = cellValue;
                 }
@@ -150,10 +176,12 @@ public class ExcelManager {
             Bonus bonus = new Bonus(blockBonus,rankBonus,fortuneBonus);
             result.put(id,bonus);
         }
+        excel.close();
         return result;
     }
 
-    public Map<String, Integer> readBaseWeight(){
+    public Map<String, Integer> readBaseWeight() throws IOException{
+        excel.open();
         excel.setSheet(DROP_TABLE_SHEET_NAME);
         Map<String, Integer> result = new HashMap<>();
         for(int row = DROP_TABLE_START_ROW; row<=DROP_TABLE_END_ROW;row++) {
@@ -167,13 +195,24 @@ public class ExcelManager {
                 Error.puts(String.format("DROP_TABLE:『%d行』の基礎比重状況の読み込みに失敗しました。", row));
             }
         }
+        excel.close();
         return result;
     }
 
     public Set<Probability> createProbabilities(){
-        Map<String,ItemStack> items = readItems();
-        Map<String,Bonus> bonus = readBonus();
-        Map<String,Integer> weight = readBaseWeight();
+
+        Map<String,ItemStack> items;
+        Map<String,Bonus> bonus;
+        Map<String,Integer> weight;
+        try{
+            items = readItems();
+            bonus = readBonus();
+            weight = readBaseWeight();
+        }catch (IOException e){
+            e.printStackTrace();
+            Error.puts("[重要] データファイルが見つからないため、データを構築できません");
+            return null;
+        }
         if(items.size()!=bonus.size()|| items.size()!=weight.size()){
             Error.puts("登録アイテム数とドロップテーブルの個数が異なります。全てが正常に読み取れていない可能性があります");
         }

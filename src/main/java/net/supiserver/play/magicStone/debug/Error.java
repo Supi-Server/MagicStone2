@@ -13,4 +13,8 @@ public class Error {
     public static void reset(){
         errors = new ArrayList<>();
     }
+
+    public static List<String> get(){
+        return errors;
+    }
 }

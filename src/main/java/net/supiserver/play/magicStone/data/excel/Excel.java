@@ -1,9 +1,9 @@
 package net.supiserver.play.magicStone.data.excel;
 
+import net.supiserver.play.magicStone.debug.Error;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,17 +11,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Excel {
-    private final Workbook workbook;
+    private Workbook workbook;
+    private String default_sheet;
     private Sheet sheet;
+    private String filePath;
+    private FileInputStream fis;
 
-    public Excel(String filePath)throws IOException{this(filePath,"Sheet1");}
-    public Excel(String filePath,String default_sheet)throws IOException{
-        Workbook workbook = null;
-        FileInputStream fis = new FileInputStream(filePath);
-        workbook = new XSSFWorkbook(fis);
-
-        this.workbook = workbook;
-        this.sheet = workbook.getSheet(default_sheet);
+    public Excel(String filePath){this(filePath,"Sheet1");}
+    public Excel(String filePath,String default_sheet){
+        this.default_sheet = default_sheet;
+        this.filePath = filePath;
     }
 
     public void setSheet(String sheet_name){
@@ -86,6 +85,19 @@ public class Excel {
         }
 
         return columnName.toString() + rowIndex;
+    }
+
+    public void open() throws IOException {
+        Workbook workbook;
+        FileInputStream fis = new FileInputStream(filePath);
+        this.fis = fis;
+        workbook = new XSSFWorkbook(fis);
+
+        this.workbook = workbook;
+        this.sheet = workbook.getSheet(default_sheet);
+    }
+    public void close() throws IOException {
+        this.fis.close();
     }
 
 }
