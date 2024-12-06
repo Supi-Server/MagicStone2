@@ -14,16 +14,16 @@ public class Item {
     private final int custom_model;
     private ItemStack item;
 
-    public Item(String id, Material material, String name, List<String> lore, int custom_model){
-        this.id=id;
-        this.material=material;
-        this.name=name;
+    public Item(String id, Material material, String name, List<String> lore, int custom_model) {
+        this.id = id;
+        this.material = material;
+        this.name = name;
         this.lore = lore;
         this.custom_model = custom_model;
         this.reload();
     }
 
-    public void reload(){
+    public void reload() {
         ItemStack item = new ItemStack(material);
         ItemMeta itemMeta = item.getItemMeta();
         assert itemMeta != null;
@@ -31,11 +31,14 @@ public class Item {
         itemMeta.setLore(lore);
         itemMeta.setCustomModelData(custom_model);
         item.setItemMeta(itemMeta);
-        this.item=item;
+        this.item = item;
     }
 
-    public String id(){return this.id;}
-    public ItemStack get(){
+    public String id() {
+        return this.id;
+    }
+
+    public ItemStack get() {
         return this.item;
     }
 }

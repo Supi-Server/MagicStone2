@@ -12,12 +12,9 @@ public enum Rank {
     SUPICIALIST("supicialist");
 
     private final String value;
-    Rank(String value){
-        this.value = value;
-    }
 
-    public String getValue(){
-        return this.value;
+    Rank(String value) {
+        this.value = value;
     }
 
     public static Rank fromValue(String value) {
@@ -27,5 +24,9 @@ public enum Rank {
             }
         }
         throw new IllegalArgumentException("Invalid Rank value: " + value);
+    }
+
+    public String getValue() {
+        return this.value;
     }
 }

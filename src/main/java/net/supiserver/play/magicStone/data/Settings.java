@@ -28,12 +28,12 @@ public class Settings {
     );
     private static Set<String> TARGET_WORLDS = Set.of("shigen");
 
-    public static void reload(JavaPlugin plugin, ExcelManager em){
+    public static void reload(JavaPlugin plugin, ExcelManager em) {
         FileConfiguration config = plugin.getConfig();
 
         List<String> blocks = config.getStringList("blocks");
-        if(blocks.isEmpty()){
-            blocks = List.of(   "STONE",
+        if (blocks.isEmpty()) {
+            blocks = List.of("STONE",
                     "ANDESITE",
                     "DIORITE",
                     "GRANITE",
@@ -49,37 +49,37 @@ public class Settings {
         Map<BasicData, String> basicData;
         try {
             basicData = em.reloadBasicData();
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             Error.puts("[重要] データファイルが見つからないため、データを構築できません");
             return;
         }
-        MAX_WEIGHT = (int)Double.parseDouble(basicData.get(BasicData.MAX_WEIGHT));
-        MAX_FORTUNE_LEVEL = (int)Double.parseDouble(basicData.get(BasicData.MAX_FORTUNE_LEVEL));
+        MAX_WEIGHT = (int) Double.parseDouble(basicData.get(BasicData.MAX_WEIGHT));
+        MAX_FORTUNE_LEVEL = (int) Double.parseDouble(basicData.get(BasicData.MAX_FORTUNE_LEVEL));
     }
 
-    public static int getMaxWeight(){
+    public static int getMaxWeight() {
         return MAX_WEIGHT;
     }
 
-    public static int getMaxFortuneLevel(){
+    public static int getMaxFortuneLevel() {
         return MAX_FORTUNE_LEVEL;
     }
 
-    public static Set<Material> getTargetBlocks(){
+    public static Set<Material> getTargetBlocks() {
         return TARGET_BLOCKS;
     }
 
-    public static Set<String> getTargetWorlds(){
+    public static Set<String> getTargetWorlds() {
         return TARGET_WORLDS;
     }
 
-    public static String getAsString(){
+    public static String getAsString() {
         return String.format(String.format("{MAX_WEIGHT: %s, MAX_FORTUNE_LEVEL: %s, TARGET_BLOCKS: %s, TARGET_WORLDS: %s}",
-            MAX_WEIGHT,
-            MAX_FORTUNE_LEVEL,
-            TARGET_BLOCKS.toString(),
-            TARGET_WORLDS.toString()
+                MAX_WEIGHT,
+                MAX_FORTUNE_LEVEL,
+                TARGET_BLOCKS.toString(),
+                TARGET_WORLDS.toString()
         ));
     }
 }

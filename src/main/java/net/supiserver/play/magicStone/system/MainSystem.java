@@ -21,64 +21,66 @@ import java.util.Set;
 
 
 public class MainSystem {
-    private Map<Material,BlockData> blockDataMap = null;
+    private Map<Material, BlockData> blockDataMap = null;
     private Set<Probability> probabilitySet = null;
     private Map<String, ItemStack> magicStones = null;
 
-    public MainSystem(){
+    public MainSystem() {
         JavaPlugin plugin = MagicStone.getInstance();
         Error.reset();
         this.reloadData();
 
-        new BlockBreak(plugin,this);
+        new BlockBreak(plugin, this);
         new Join(plugin);
         new AdminCommand(this);
     }
 
-    public void reloadData(){
+    public void reloadData() {
         JavaPlugin plugin = MagicStone.getInstance();
         FileConfiguration config = plugin.getConfig();
 
         ExcelManager em;
-        Map<String,ItemStack> items;
+        Map<String, ItemStack> items;
         Set<Probability> probabilitySet;
-        try{
-            em=new ExcelManager(config.getString("data_table_path","plugins/MagicStone/data_table.xlsx"));
+        try {
+            em = new ExcelManager(config.getString("data_table_path", "plugins/MagicStone/data_table.xlsx"));
             items = em.readItems();
             probabilitySet = em.createProbabilities();
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             Error.puts("[重要] データファイルが見つからないため、データを構築できません");
             return;
         }
-        Settings.reload(plugin,em);
+        Settings.reload(plugin, em);
 
         this.magicStones = items;
         this.probabilitySet = probabilitySet;
-        Map<Material,BlockData> blockDataMap = new HashMap<>();
-        Settings.getTargetBlocks().forEach(block->{
-            BlockData blockData = new BlockData(block,probabilitySet);
+        Map<Material, BlockData> blockDataMap = new HashMap<>();
+        Settings.getTargetBlocks().forEach(block -> {
+            BlockData blockData = new BlockData(block, probabilitySet);
             blockData.setup();
-            blockDataMap.put(block,blockData);
+            blockDataMap.put(block, blockData);
         });
         this.blockDataMap = blockDataMap;
-    };
+    }
 
-    public String printProbabilities(){
+    ;
+
+    public String printProbabilities() {
         StringBuilder msgBuilder = new StringBuilder();
         probabilitySet.forEach(probability -> {
             msgBuilder.append(probability.toString()).append(",");
         });
         msgBuilder.append(Settings.getAsString());
         String msg = msgBuilder.toString();
-        return String.format("[%s]\n",msg);
+        return String.format("[%s]\n", msg);
     }
 
-    public BlockData getBlockData(Material mate){
+    public BlockData getBlockData(Material mate) {
         return blockDataMap.get(mate);
     }
 
-    public Map<String,ItemStack> getMagicStones(){
+    public Map<String, ItemStack> getMagicStones() {
         return magicStones;
     }
 
