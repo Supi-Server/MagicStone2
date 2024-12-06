@@ -15,12 +15,12 @@ public class BlockData {
     public BlockData(Material block, Set<Probability> probabilities) {
         this.block = block;
         this.probabilities = probabilities;
-        for(int i = 0;i<Settings.getMaxFortuneLevel()+1;i++)drop_table.add(null); //nullで埋めておく
+        for (int i = 0; i < Settings.getMaxFortuneLevel() + 1; i++) drop_table.add(null); //nullで埋めておく
         this.setup();
     }
 
     public void setup() {
-        for (int i = 0; i < Settings.getMaxFortuneLevel()+1; i++) {
+        for (int i = 0; i < Settings.getMaxFortuneLevel() + 1; i++) {
             Map<Rank, TreeMap<Double, ItemStack>> rank_data = new HashMap<>();
             for (Rank rank : Rank.values()) {
                 double weight = 0;
@@ -35,7 +35,10 @@ public class BlockData {
         }
     }
 
-    public ItemStack run_lottery(Rank rank, int fortune){return run_lottery(rank,fortune,-1);}
+    public ItemStack run_lottery(Rank rank, int fortune) {
+        return run_lottery(rank, fortune, -1);
+    }
+
     public ItemStack run_lottery(Rank rank, int fortune, double hit) {
         TreeMap<Double, ItemStack> table = drop_table.get(fortune).get(rank);
         hit = hit < 0 ? Math.random() * Settings.getMaxWeight() : hit;
@@ -49,7 +52,7 @@ public class BlockData {
         return null;
     }
 
-    public String toString(Rank rank, int fortune){
+    public String toString(Rank rank, int fortune) {
         return drop_table.get(fortune).get(rank).toString();
     }
 }
