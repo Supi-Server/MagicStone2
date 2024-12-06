@@ -31,7 +31,7 @@ public class Probability {
 
     public String toString(){
         return String.format("{ItemStack: %s, BaseWeight: %d, Bonus: %s",
-                Objects.requireNonNull(item.getItemMeta()).getItemName(),
+                item.toString(),
                 base_weight,
                 bonus.toString()
         );

@@ -13,7 +13,6 @@ public final class MagicStone extends JavaPlugin {
         plugin = this;
         this.saveDefaultConfig();;
         system = new MainSystem();
-        system.printProbabilities();
     }
 
     @Override

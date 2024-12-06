@@ -2,3 +2,7 @@ name: MagicStone
 version: '1.0-SNAPSHOT'
 main: net.supiserver.play.magicStone.MagicStone
 api-version: '1.21'
+
+commands:
+  magicstone:
+    description: "魔法石用のコマンドです"

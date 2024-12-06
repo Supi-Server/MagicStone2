@@ -35,13 +35,16 @@ public class BlockData {
         }
     }
 
-    public ItemStack run_lottery(Rank rank, int fortune) {
+    public ItemStack run_lottery(Rank rank, int fortune){return run_lottery(rank,fortune,-1);}
+    public ItemStack run_lottery(Rank rank, int fortune, double hit) {
         TreeMap<Double, ItemStack> table = drop_table.get(fortune).get(rank);
-        double hit = Math.random() * Settings.getMaxWeight();
+        hit = hit < 0 ? Math.random() * Settings.getMaxWeight() : hit;
         for (Map.Entry<Double, ItemStack> entry : table.entrySet()) {
             double weight = entry.getKey();
             ItemStack item = entry.getValue();
-            if (hit <= weight) return item;
+            if (hit <= weight) {
+                return item;
+            }
         }
         return null;
     }
