@@ -7,9 +7,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-import static net.supiserver.play.magicStone.Settings.MAX_FORTUNE_LEVEL;
-import static net.supiserver.play.magicStone.Settings.MAX_WEIGHT;
-
 public class BlockData {
     private final Material block;
     private final Set<Probability> probabilities;
@@ -18,12 +15,12 @@ public class BlockData {
     public BlockData(Material block, Set<Probability> probabilities) {
         this.block = block;
         this.probabilities = probabilities;
-        for(int i = 0;i<MAX_FORTUNE_LEVEL+1;i++)drop_table.add(null); //nullで埋めておく
+        for(int i = 0;i<Settings.getMaxFortuneLevel()+1;i++)drop_table.add(null); //nullで埋めておく
         this.setup();
     }
 
     public void setup() {
-        for (int i = 0; i < MAX_FORTUNE_LEVEL+1; i++) {
+        for (int i = 0; i < Settings.getMaxFortuneLevel()+1; i++) {
             Map<Rank, TreeMap<Double, ItemStack>> rank_data = new HashMap<>();
             for (Rank rank : Rank.values()) {
                 double weight = 0;
@@ -40,12 +37,16 @@ public class BlockData {
 
     public ItemStack run_lottery(Rank rank, int fortune) {
         TreeMap<Double, ItemStack> table = drop_table.get(fortune).get(rank);
-        double hit = Math.random() * MAX_WEIGHT;
+        double hit = Math.random() * Settings.getMaxWeight();
         for (Map.Entry<Double, ItemStack> entry : table.entrySet()) {
             double weight = entry.getKey();
             ItemStack item = entry.getValue();
             if (hit <= weight) return item;
         }
         return null;
+    }
+
+    public String toString(Rank rank, int fortune){
+        return drop_table.get(fortune).get(rank).toString();
     }
 }

@@ -3,9 +3,7 @@ package net.supiserver.play.magicStone.data.excel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,7 +14,7 @@ public class Excel {
 
     public Excel(String filePath)throws IOException{this(filePath,"Sheet1");}
     public Excel(String filePath,String default_sheet)throws IOException{
-        Workbook workbook = null;
+        Workbook workbook;
         FileInputStream fis = new FileInputStream(filePath);
         workbook = new XSSFWorkbook(fis);
 

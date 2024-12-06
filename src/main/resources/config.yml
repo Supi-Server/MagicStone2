@@ -1,1 +1,15 @@
 data_table_path: "plugins/MagicStone/data_table.xlsx"
+
+max_fortune_level: 5
+
+blocks:
+  - "STONE",
+  - "ANDESITE",
+  - "DIORITE",
+  - "GRANITE",
+  - "TUFF",
+  - "CALCITE",
+  - "DEEPSLATE"
+
+worlds:
+  - "shigen"

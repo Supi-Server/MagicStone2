@@ -1,5 +1,6 @@
 package net.supiserver.play.magicStone;
 
+import net.supiserver.play.magicStone.data.Settings;
 import net.supiserver.play.magicStone.system.MainSystem;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -10,7 +11,7 @@ public final class MagicStone extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         plugin = this;
-        this.saveDefaultConfig();
+        this.saveDefaultConfig();;
         system = new MainSystem();
         system.printProbabilities();
     }

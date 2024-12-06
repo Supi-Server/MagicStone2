@@ -1,5 +1,6 @@
 package net.supiserver.play.magicStone.data.excel;
 
+import net.supiserver.play.magicStone.data.Settings;
 import net.supiserver.play.magicStone.debug.Error;
 import net.supiserver.play.magicStone.model.Bonus;
 import net.supiserver.play.magicStone.model.Item;
@@ -11,7 +12,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.IOException;
 import java.util.*;
 
-import static net.supiserver.play.magicStone.Settings.MAX_FORTUNE_LEVEL;
 
 public class ExcelManager {
     private static final String DEVELOP_SHEET_NAME = "develop_info";
@@ -40,6 +40,9 @@ public class ExcelManager {
     private final String DROP_TABLE_FORTUNE_BONUS_START_COL;
     private final String DROP_TABLE_FORTUNE_BONUS_END_COL;
 
+    private final String BASIC_INFO_SHEET_NAME;
+    private final String BASIC_INFO_MAX_WEIGHT_CELL;
+
     private final Excel excel;
 
     public ExcelManager(String filePath)throws IOException{
@@ -66,6 +69,22 @@ public class ExcelManager {
         DROP_TABLE_RANK_BONUS_END_COL = excel.read("D18","U");
         DROP_TABLE_FORTUNE_BONUS_START_COL = excel.read("D19","V");
         DROP_TABLE_FORTUNE_BONUS_END_COL = excel.read("D20","Z");
+
+        BASIC_INFO_SHEET_NAME = excel.read("D21","basic_info");
+        BASIC_INFO_MAX_WEIGHT_CELL = excel.read("D22","C2");
+    }
+
+    public Map<BasicData,String> reloadBasicData(){
+        Map<BasicData,String> result = new HashMap<>();
+        result.put(BasicData.MAX_FORTUNE_LEVEL,
+            String.valueOf(
+            Excel.getCellIndex(DROP_TABLE_FORTUNE_BONUS_END_COL+"1")[1] -
+                Excel.getCellIndex(DROP_TABLE_FORTUNE_BONUS_START_COL)[1]
+            )
+        );
+        excel.setSheet(BASIC_INFO_SHEET_NAME);
+        result.put(BasicData.MAX_FORTUNE_LEVEL,excel.read(BASIC_INFO_MAX_WEIGHT_CELL));
+        return result;
     }
 
     public Map<String,ItemStack> readItems(){
@@ -89,6 +108,7 @@ public class ExcelManager {
     }
 
     public Map<String, Bonus> readBonus(){
+        int MAX_FORTUNE_LEVEL = Settings.getMaxFortuneLevel();
         excel.setSheet(DROP_TABLE_SHEET_NAME);
         Map<String,Bonus> result = new HashMap<>();
         for(int row = DROP_TABLE_START_ROW; row<=DROP_TABLE_END_ROW;row++){
@@ -136,8 +156,8 @@ public class ExcelManager {
             try{
                 int fortune_start_column = Excel.getCellIndex(DROP_TABLE_FORTUNE_BONUS_START_COL+row)[1];
                 int fortune_end_column = Excel.getCellIndex(DROP_TABLE_FORTUNE_BONUS_END_COL+row)[1];
+                fortune_end_column = Math.max(fortune_end_column,fortune_start_column+MAX_FORTUNE_LEVEL);
                 for(int i = fortune_start_column;i<=fortune_end_column;i++){
-                    String rank = excel.read(Excel.getCellName(new int[]{i,DROP_TABLE_START_ROW-1}));
                     double cellValue = Double.parseDouble(excel.read(Excel.getCellName(new int[]{i,row})));
                     fortuneBonus[i-fortune_start_column] = cellValue;
                 }
